@@ -183,7 +183,7 @@ onUnmounted(() => {
             <p class="text-muted text-xs leading-relaxed mb-2">{{ t('adSupportDesc') }}</p>
             <a href="https://github.com/lcy362/agnes-video-generator" target="_blank" rel="noopener">{{ t('adStar') }}</a>
             <p class="text-muted text-xs px-1 -mt-0.5 mb-1">{{ t('adStarDesc') }}</p>
-            <a href="https://github.com/lcy362/flint" target="_blank" rel="noopener" class="wrap">{{ t('adSkewStar') }}</a>
+            <a href="https://flint.lichuanyang.top/" target="_blank" rel="noopener" class="wrap">{{ t('adSkewStar') }}</a>
             <p class="text-muted text-xs px-1 -mt-0.5 mb-1">{{ t('adSkewStarDesc') }}</p>
             <a href="https://video.lichuanyang.top" target="_blank" rel="noopener">{{ t('adAdblock') }}</a>
             <p class="text-muted text-xs px-1 -mt-0.5 mb-1">{{ t('adAdblockDesc') }}</p>
@@ -342,7 +342,7 @@ onUnmounted(() => {
             <a href="https://video.lichuanyang.top/api-docs" target="_blank" rel="noopener" class="text-muted hover:text-ink-2 transition-colors">{{ t('apiDocs') }}</a>
             <a href="https://video.lichuanyang.top/learn" target="_blank" rel="noopener" class="text-muted hover:text-ink-2 transition-colors">{{ t('appScenarios') }}</a>
             <a href="https://video.lichuanyang.top/zh/guides/free-ai-tools" target="_blank" rel="noopener" class="text-muted hover:text-ink-2 transition-colors">{{ t('agentMoreTools') }}</a>
-            <a href="https://github.com/lcy362/flint" target="_blank" rel="noopener" class="text-muted hover:text-ink-2 transition-colors">{{ t('flintLinkLabel') }}</a>
+            <a href="https://flint.lichuanyang.top/" target="_blank" rel="noopener" class="text-muted hover:text-ink-2 transition-colors">{{ t('flintLinkLabel') }}</a>
             <a href="https://github.com/lcy362/agnes-video-generator" target="_blank" rel="noopener" class="text-muted hover:text-ink-2 transition-colors">📖 GitHub</a>
           </div>
         </div>
