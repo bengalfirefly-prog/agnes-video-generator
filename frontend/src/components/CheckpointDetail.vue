@@ -280,7 +280,7 @@ function artLabel(a: any): string {
           <div class="text-xs text-muted mt-0.5">{{ t('handleAgentDesc') }}</div>
         </button>
         <a :href="moreToolsHref" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-[10px] text-accent hover:text-ink transition-colors mt-1.5">🔗 {{ t('agentMoreTools') }}</a>
-        <a href="https://flint.lichuanyang.top/" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-[10px] text-accent hover:text-ink transition-colors mt-1.5">{{ t('handleAgentFlint') }}</a>
+        <a href="https://github.com/lcy362/flint" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-[10px] text-accent hover:text-ink transition-colors mt-1.5">{{ t('handleAgentFlint') }}</a>
       </div>
       <button class="p-3 rounded-xl border text-left transition"
         :class="editableTextArts.length

@@ -87,7 +87,7 @@ Agnes Video Generator is and will always remain completely free and open-source.
 If you find this project helpful, here are a few ways to support its continued development:
 
 - **⭐ Star on GitHub** — Star the [repository](https://github.com/lcy362/agnes-video-generator) to help others discover this project.
-- **🪨 Star the author's new project [Flint](https://flint.lichuanyang.top/)** — a local-first AI skills manager for your Claude Code / Cursor / other agents. Centralize, tag and reuse the skills you keep building.
+- **🪨 Star the author's new project [Flint](https://github.com/lcy362/flint)** — a local-first AI skills manager for your Claude Code / Cursor / other agents. Centralize, tag and reuse the skills you keep building.
 - **🌐 Whitelist the official website** — Turn off your ad blocker on [video.lichuanyang.top](https://video.lichuanyang.top) and click on an ad if something catches your eye. A small gesture that makes a real difference.
 - **📢 Share your creations** — Post videos made with Agnes Video Generator on social media (Douyin, YouTube, Xiaohongshu, etc.) and tag the project. More exposure means more users, more feedback, and a better tool for everyone.
 
@@ -170,6 +170,6 @@ More projects by the same author:
 
 - **[Agnes Video Generator](https://github.com/lcy362/agnes-video-generator)** — Completely free AI video generator (this project).
 - **[FreeShortVideoStudio](https://github.com/lcy362/free-short-video-studio)** — Fully online, in-browser video studio.
-- **[Flint](https://flint.lichuanyang.top/)** — Local-first AI skills manager: centralize, tag, deduplicate and deploy your Skills into any agent or project directory. If it helps you, a star is very welcome! ⭐
+- **[Flint](https://github.com/lcy362/flint)** — Local-first AI skills manager: centralize, tag, deduplicate and deploy your Skills into any agent or project directory. If it helps you, a star is very welcome! ⭐
 
 **Keywords**: free AI video generator, AI video generation tool, text to video AI, free AI video maker, AI video creator, open source video generator, Agnes AI, text-to-video, image-to-video, keyframes video, AI narration, auto subtitles, multi-scene video, zero cost AI video, no subscription AI video tool, digital anchor, self-hosted AI video generator, open source alternative to Runway
