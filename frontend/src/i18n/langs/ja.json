@@ -249,6 +249,7 @@
   "handleSelfDesc": "パスを確認し、ローカルでファイルを編集してから確認します",
   "handleAgent": "外部エージェント",
   "handleAgentDesc": "コマンドとプロンプトをコピーし、ローカルエージェントを使用してから確認します",
+  "handleAgentFlint": "🗂️ 処理フローとプロンプトを Skill として保存し、Flint で管理",
   "aiModifyRequest": "修正リクエスト",
   "aiModifyRequestPlaceholder": "例：シーン2のナレーションをもっと口語的に",
   "aiModifyStart": "修正開始",
@@ -584,5 +585,8 @@
   "detectKeysHint": "自动为每个 Key 探测并补写匹配的域名",
   "detectKeysDone": "域名探测完成，已更新",
   "detectKeysBusy": "探测正在进行或触发过于频繁，请稍候再试",
-  "failDetectKeys": "域名探测失败"
+  "failDetectKeys": "域名探测失败",
+  "adSkewStar": "⭐ 新プロジェクト Flint に Star",
+  "adSkewStarDesc": "作者の新スキルマネージャーを支援",
+  "flintLinkLabel": "🪨 Flint · スキル管理"
 }

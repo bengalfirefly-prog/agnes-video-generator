@@ -242,6 +242,7 @@
   "handleSelfDesc": "View paths, edit files locally, then confirm",
   "handleAgent": "External Agent",
   "handleAgentDesc": "Copy command and prompt, use a local agent, then confirm",
+  "handleAgentFlint": "🗂️ Save your workflow and prompts as Skills, manage them with Flint",
   "handleEdit": "Edit Inline",
   "handleEditDesc": "Edit text artifacts in a modal and save, compare with the original anytime",
   "aiModifyRequest": "Edit Request",
@@ -579,5 +580,8 @@
   "gaNeverUploadTitle": "The following is never uploaded, regardless of the toggle",
   "gaNeverUploadText": "Creative content such as prompts, manuscripts, and poem texts; API keys; reference images. All content fields are replaced with a <redacted> marker before reporting, long texts are truncated, and nothing enters the analytics system.",
   "gaStatOn": "Analytics on",
-  "gaStatOff": "Analytics off"
+  "gaStatOff": "Analytics off",
+  "adSkewStar": "⭐ Star Flint (new project)",
+  "adSkewStarDesc": "Help the author's new skills manager",
+  "flintLinkLabel": "🪨 Flint · Skills Manager"
 }

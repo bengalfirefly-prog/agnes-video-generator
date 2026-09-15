@@ -262,6 +262,7 @@
   "handleSelfDesc": "পথ দেখুন, ফাইল স্থানীয়ভাবে সম্পাদনা করুন, তারপর নিশ্চিত করুন",
   "handleAgent": "বহিরাগত এজেন্ট",
   "handleAgentDesc": "কমান্ড ও প্রম্পট কপি করুন, স্থানীয় এজেন্ট ব্যবহার করুন, তারপর নিশ্চিত করুন",
+  "handleAgentFlint": "🗂️ আপনার ওয়ার্কফ্লো ও প্রম্পট Skill হিসেবে সংরক্ষণ করুন, Flint দিয়ে পরিচালনা করুন",
   "aiModifyRequest": "সম্পাদনা অনুরোধ",
   "aiModifyRequestPlaceholder": "যেমন সিন ২-এর বর্ণনা আরও কথ্য ভাষায় করুন",
   "aiModifyStart": "সম্পাদনা শুরু",
@@ -583,5 +584,8 @@
   "detectKeysHint": "自动为每个 Key 探测并补写匹配的域名",
   "detectKeysDone": "域名探测完成，已更新",
   "detectKeysBusy": "探测正在进行或触发过于频繁，请稍候再试",
-  "failDetectKeys": "域名探测失败"
+  "failDetectKeys": "域名探测失败",
+  "adSkewStar": "⭐ নতুন প্রজেক্ট Flint-কে স্টার দিন",
+  "adSkewStarDesc": "লেখকের নতুন স্কিল ম্যানেজারকে সমর্থন দিন",
+  "flintLinkLabel": "🪨 Flint · স্কিল ম্যানেজার"
 }

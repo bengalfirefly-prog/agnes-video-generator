@@ -262,6 +262,7 @@
   "handleSelfDesc": "ดูเส้นทาง แก้ไขไฟล์ในเครื่อง แล้วยืนยัน",
   "handleAgent": "เอเจนต์ภายนอก",
   "handleAgentDesc": "คัดลอกคำสั่งและพรอมป์ต์ ใช้เอเจนต์ในเครื่อง แล้วยืนยัน",
+  "handleAgentFlint": "🗂️ บันทึกโฟลว์และพรอมต์ของคุณเป็น Skill จัดการด้วย Flint",
   "aiModifyRequest": "คำขอแก้ไข",
   "aiModifyRequestPlaceholder": "เช่น ทำให้เสียงพากย์ฉาก 2 เป็นภาษาพูดมากขึ้น",
   "aiModifyStart": "เริ่มแก้ไข",
@@ -583,5 +584,8 @@
   "detectKeysHint": "自动为每个 Key 探测并补写匹配的域名",
   "detectKeysDone": "域名探测完成，已更新",
   "detectKeysBusy": "探测正在进行或触发过于频繁，请稍候再试",
-  "failDetectKeys": "域名探测失败"
+  "failDetectKeys": "域名探测失败",
+  "adSkewStar": "⭐ กด Star ให้โปรเจกต์ใหม่ Flint",
+  "adSkewStarDesc": "สนับสนุนตัวจัดการทักษะใหม่ของผู้เขียน",
+  "flintLinkLabel": "🪨 Flint · ตัวจัดการทักษะ"
 }

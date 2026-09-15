@@ -293,6 +293,7 @@
     text-overflow: ellipsis;
   }
   .sidebar-card a:hover { color: var(--color-ink-2); background: var(--color-paper-3); }
+  .sidebar-card a.wrap { white-space: normal; overflow: visible; text-overflow: clip; align-items: flex-start; line-height: 1.35; }
   .sidebar-card .stitle {
     font-size: 0.7rem;
     font-weight: 600;

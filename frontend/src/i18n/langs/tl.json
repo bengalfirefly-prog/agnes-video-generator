@@ -262,6 +262,7 @@
   "handleSelfDesc": "Tingnan ang mga path, i-edit ang mga file nang lokal, pagkatapos ay kumpirmahin",
   "handleAgent": "Panlabas na Agent",
   "handleAgentDesc": "Kopyahin ang command at prompt, gumamit ng lokal na agent, pagkatapos ay kumpirmahin",
+  "handleAgentFlint": "🗂️ I-save ang iyong workflow at prompt bilang Skill, pamahalaan gamit ang Flint",
   "aiModifyRequest": "Kahilingan sa Pag-edit",
   "aiModifyRequestPlaceholder": "hal. gawing mas kolokyal ang narration ng scene 2",
   "aiModifyStart": "Simulan ang Pag-edit",
@@ -583,5 +584,8 @@
   "detectKeysHint": "自动为每个 Key 探测并补写匹配的域名",
   "detectKeysDone": "域名探测完成，已更新",
   "detectKeysBusy": "探测正在进行或触发过于频繁，请稍候再试",
-  "failDetectKeys": "域名探测失败"
+  "failDetectKeys": "域名探测失败",
+  "adSkewStar": "⭐ Star ang bagong proyektong Flint",
+  "adSkewStarDesc": "Suportahan ang bagong tagapamahala ng skill",
+  "flintLinkLabel": "🪨 Flint · Tagapamahala ng Skill"
 }

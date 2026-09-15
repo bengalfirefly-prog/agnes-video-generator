@@ -249,6 +249,7 @@
   "handleSelfDesc": "경로를 확인하고 로컬에서 파일을 수정한 후 확인",
   "handleAgent": "외부 에이전트",
   "handleAgentDesc": "명령과 프롬프트를 복사해 로컬 에이전트를 사용한 후 확인",
+  "handleAgentFlint": "🗂️ 워크플로와 프롬프트를 Skill로 저장하고 Flint로 관리",
   "aiModifyRequest": "수정 요청",
   "aiModifyRequestPlaceholder": "예: 장면 2 내레이션을 더 구어체로",
   "aiModifyStart": "수정 시작",
@@ -584,5 +585,8 @@
   "detectKeysHint": "自动为每个 Key 探测并补写匹配的域名",
   "detectKeysDone": "域名探测完成，已更新",
   "detectKeysBusy": "探测正在进行或触发过于频繁，请稍候再试",
-  "failDetectKeys": "域名探测失败"
+  "failDetectKeys": "域名探测失败",
+  "adSkewStar": "⭐ 새 프로젝트 Flint에 Star",
+  "adSkewStarDesc": "작성자의 새 스킬 매니저 지원",
+  "flintLinkLabel": "🪨 Flint · 스킬 허브"
 }

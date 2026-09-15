@@ -477,6 +477,7 @@
   "handleSelfDesc": "查看路径后在本地修改文件，改完回来确认",
   "handleAgent": "🤝 外部 Agent",
   "handleAgentDesc": "复制命令和提示词，用本地 Agent 处理后回来确认",
+  "handleAgentFlint": "🗂️ 把你的处理流程和提示词保存为 Skill，用 Flint 管理",
   "handleEdit": "💻 在线编辑",
   "handleEditDesc": "弹窗内直接修改文本产物并保存，可随时与原内容对比",
   "aiModifyRequest": "修改要求",
@@ -579,5 +580,8 @@
   "gaNeverUploadTitle": "无论开关状态，以下内容都绝不会被上传",
   "gaNeverUploadText": "提示词、稿件、诗词原文等创作内容；API Key；参考图片。所有内容类字段在上报前均被替换为 <redacted> 脱敏标记，长文本自动截断，不进入分析系统。",
   "gaStatOn": "统计已开启",
-  "gaStatOff": "统计已关闭"
+  "gaStatOff": "统计已关闭",
+  "adSkewStar": "⭐ 帮新项目 Flint 点 Star",
+  "adSkewStarDesc": "支持作者的新技能管理器",
+  "flintLinkLabel": "🪨 Flint · 技能管理"
 }

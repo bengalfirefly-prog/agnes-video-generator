@@ -249,6 +249,7 @@
   "handleSelfDesc": "Lihat laluan, edit fail secara tempatan, kemudian sahkan",
   "handleAgent": "Ejen Luaran",
   "handleAgentDesc": "Salin arahan dan prompt, gunakan ejen tempatan, kemudian sahkan",
+  "handleAgentFlint": "🗂️ Simpan aliran kerja dan prompt sebagai Skill, urus dengan Flint",
   "aiModifyRequest": "Permintaan Edit",
   "aiModifyRequestPlaceholder": "cth. jadikan narasi babak 2 lebih kolokial",
   "aiModifyStart": "Mula Edit",
@@ -584,5 +585,8 @@
   "detectKeysHint": "自动为每个 Key 探测并补写匹配的域名",
   "detectKeysDone": "域名探测完成，已更新",
   "detectKeysBusy": "探测正在进行或触发过于频繁，请稍候再试",
-  "failDetectKeys": "域名探测失败"
+  "failDetectKeys": "域名探测失败",
+  "adSkewStar": "⭐ Star projek baru Flint",
+  "adSkewStarDesc": "Sokong pengurus kemahiran baharu pengarang",
+  "flintLinkLabel": "🪨 Flint · Hub Kemahiran"
 }

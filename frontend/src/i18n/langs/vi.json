@@ -262,6 +262,7 @@
   "handleSelfDesc": "Xem đường dẫn, chỉnh sửa tệp cục bộ rồi xác nhận",
   "handleAgent": "Tác nhân ngoài",
   "handleAgentDesc": "Sao chép lệnh và prompt, dùng tác nhân cục bộ rồi xác nhận",
+  "handleAgentFlint": "🗂️ Lưu quy trình và prompt của bạn thành Skill, quản lý bằng Flint",
   "aiModifyRequest": "Yêu cầu chỉnh sửa",
   "aiModifyRequestPlaceholder": "vd. làm lời thuyết minh cảnh 2 gần gũi hơn",
   "aiModifyStart": "Bắt đầu chỉnh sửa",
@@ -583,5 +584,8 @@
   "detectKeysHint": "自动为每个 Key 探测并补写匹配的域名",
   "detectKeysDone": "域名探测完成，已更新",
   "detectKeysBusy": "探测正在进行或触发过于频繁，请稍候再试",
-  "failDetectKeys": "域名探测失败"
+  "failDetectKeys": "域名探测失败",
+  "adSkewStar": "⭐ Star cho dự án mới Flint",
+  "adSkewStarDesc": "Ủng hộ trình quản lý kỹ năng mới của tác giả",
+  "flintLinkLabel": "🪨 Flint · Quản lý kỹ năng"
 }

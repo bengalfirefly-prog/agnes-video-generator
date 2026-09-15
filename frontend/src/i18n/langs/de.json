@@ -249,6 +249,7 @@
   "handleSelfDesc": "Pfade ansehen, Dateien lokal bearbeiten, dann bestätigen",
   "handleAgent": "Externer Agent",
   "handleAgentDesc": "Befehl und Prompt kopieren, lokalen Agent verwenden, dann bestätigen",
+  "handleAgentFlint": "🗂️ Speichere deinen Workflow und Prompts als Skills und verwalte sie mit Flint",
   "aiModifyRequest": "Bearbeitungsanfrage",
   "aiModifyRequestPlaceholder": "z. B. Erzählung von Szene 2 umgangssprachlicher machen",
   "aiModifyStart": "Bearbeitung starten",
@@ -584,5 +585,8 @@
   "detectKeysHint": "自动为每个 Key 探测并补写匹配的域名",
   "detectKeysDone": "域名探测完成，已更新",
   "detectKeysBusy": "探测正在进行或触发过于频繁，请稍候再试",
-  "failDetectKeys": "域名探测失败"
+  "failDetectKeys": "域名探测失败",
+  "adSkewStar": "⭐ Stern für neues Projekt Flint",
+  "adSkewStarDesc": "Unterstützen Sie den neuen Skill-Manager",
+  "flintLinkLabel": "🪨 Flint · Skill-Hub"
 }
