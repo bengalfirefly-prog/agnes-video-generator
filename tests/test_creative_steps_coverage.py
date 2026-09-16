@@ -1664,7 +1664,16 @@ class TestMultiRun:
         with pytest.raises(RuntimeError):
             asyncio.run(pipe.run(state))
         assert state.status == StepStatus.FAILED
-        # error_traceback is surfaced via task_manager.update_state()
-        recorded = [c for c in pipe.task_manager.calls if c[0] == "state"]
-        last = recorded[-1][1]
-        assert "error_traceback" in last and "Traceback" in last["error_traceback"]
+        # error_traceback 与真实环节名在同一次失败落盘中写出（诊断报告归因依赖）
+        recorded = [c[1] for c in pipe.task_manager.calls if c[0] == "state"]
+        failed_write = next(
+            (kw for kw in reversed(recorded) if "error_traceback" in kw), None
+        )
+        assert failed_write is not None, "失败必须落盘完整 traceback"
+        assert "Traceback" in failed_write["error_traceback"]
+        assert failed_write["status"] == StepStatus.FAILED
+        assert "build_scenes" in failed_write["current_step"]
+        # 终态 error 事件用 preserve_step：强制落盘状态与消息，但不再覆盖环节名
+        tail = recorded[-1]
+        assert tail.get("current_status") == "failed"
+        assert "current_step" not in tail

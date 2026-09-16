@@ -214,31 +214,53 @@ class BasePipeline(ABC):
         message: str,
         progress: float = 0.0,
         data: dict = None,
+        *,
+        preserve_step: bool = False,
     ):
         """更新进度并持久化到 state（轮询模式）。
 
         将 step/status/message/progress 写入 state 的 current_* 字段，
         前端通过 GET /api/tasks/{id} 轮询读取。
+
+        Args:
+            step: 步骤 key，写入 ``current_step`` 供前端与诊断报告定位环节。
+            status: 步骤状态（running / completed / failed / awaiting_user）。
+            message: 面向用户的进度文案。
+            progress: 进度比例 0.0 ~ 1.0。
+            data: 附带数据（仅回调透传，不落盘）。
+            preserve_step: True 时**不覆盖** ``current_step``，用于 ``error``
+                这类终态事件——它们表达的是「出了问题」而不是「在哪个环节」，
+                覆盖会把真实失败环节冲掉，使诊断报告归因失真（issue #56/#57
+                真实失败在视频下载，报告却显示 scene_config）。
+
+        落盘策略（2.4 节流 + v6.4.8 终态强制）：
+        - ``status == "running"`` 的高频进度更新按 0.5s 阈值合并落盘；
+        - 其余状态（completed / failed / awaiting_user 等终态）**强制落盘**，
+          否则紧跟在上一次进度写入之后的终态会被节流整条丢弃，
+          导致盘上的 current_step/current_message 停留在旧值。
         """
         if self._state:
-            self._state.current_step = step
+            if not preserve_step:
+                self._state.current_step = step
             self._state.current_status = status
             self._state.current_progress = progress
             self._state.current_message = message
             # 2.4：进度写盘节流——进度类字段高频更新时合并落盘（0.5s 阈值）。
-            # 关键状态（video_id / scenes / paragraphs 等）不经本路径，不受影响；
-            # 任务暂停/完成会走独立的强制 update_state 保证终态一致。
+            # 关键状态（video_id / scenes / paragraphs 等）不经本路径，不受影响。
+            force_save = status != "running"
             try:
                 now = time.monotonic()
                 last = getattr(self, "_last_progress_save", 0.0)
-                if now - last >= _PROGRESS_SAVE_THROTTLE_SECONDS:
+                if force_save or now - last >= _PROGRESS_SAVE_THROTTLE_SECONDS:
                     self._last_progress_save = now
-                    self.task_manager.update_state(
-                        current_step=step,
-                        current_status=status,
-                        current_progress=progress,
-                        current_message=message,
-                    )
+                    fields = {
+                        "current_status": status,
+                        "current_progress": progress,
+                        "current_message": message,
+                    }
+                    if not preserve_step:
+                        fields["current_step"] = step
+                    self.task_manager.update_state(**fields)
             except Exception as e:
                 logger.debug(f"[Pipeline] Failed to persist progress: {e}")
 

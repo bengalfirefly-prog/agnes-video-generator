@@ -526,6 +526,7 @@
   "fbCollapsedHint": "Still failing after multiple retries? Report the issue",
   "fbExpandedHint": "Still failing after {n} retries. Please report with diagnostic info.",
   "fbDeterministicHint": "This looks like a deterministic issue caused by parameters or content. Retrying may not help.",
+  "fbNetworkHint": "مشكلة في الشبكة أو حل أسماء النطاقات على جهازك: الخادم أنهى المهمة غالبًا، لكن جهازك لا يستطيع جلب الملف. استخدم خادم DNS يستطيع الوصول إلى هذا النطاق (مثل 223.5.5.5 أو 119.29.29.29)، وعطّل اعتراض DNS لدى VPN/الوكيل وبرامج الحماية، ثم أعد المحاولة للاستئناف من الخطوة التي فشلت.",
   "fbDiagTitle": "Diagnostic Info",
   "fbCopy": "Copy Diagnostic Info",
   "fbCopied": "Copied. Please paste it into the GitHub Issue.",

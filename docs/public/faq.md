@@ -38,6 +38,19 @@ Most failures are caused by **transient factors** such as model service fluctuat
 
 If it still fails after several retries (≥ 2), the feedback area **auto-expands**, letting you copy the diagnostic info in one click and jump to a pre-filled GitHub Issue — no need to describe your environment manually.
 
+### Generation worked for a long time, then failed at the last step with `getaddrinfo failed` / `[Errno 11004]`
+
+This is a **local DNS problem on your machine**, not a generation failure. Prompts and jobs go to the API endpoint, but the finished media is served from a separate output domain (`cos-platform-outputs.agnes-ai.cn` for videos, `platform-outputs.agnes-ai.space` for images). If your resolver cannot resolve that output domain, the job is already done on the server side while your machine cannot pull the file back — so the run dies right at download time and every retry dies at the same place.
+
+Check in this order:
+
+1. Switch to a resolver that can reach the domain. In mainland China, `223.5.5.5` (AliDNS) or `119.29.29.29` (DNSPod) work; abroad, `1.1.1.1` or your ISP resolver is fine.
+2. Turn off DNS hijacking from a VPN or proxy client, and check hosts-file entries or security software that blocks unfamiliar domains.
+3. Flush the local resolver cache (`ipconfig /flushdns` on Windows, `sudo dscacheutil -flushcache` on macOS) and reload the page.
+4. Click **Retry Task**. The generated video id is kept in the task directory, so the task resumes from the failed step and only re-fetches the file — no resubmission, no extra quota.
+
+As of **v6.4.8**, the failure panel labels this class of error explicitly (a `网络诊断` / network-diagnosis message naming the domain that failed to resolve) instead of showing an opaque `RetryError[...]`, and the pre-filled Issue now reports the step that actually failed.
+
 ### Why do I get `401` / "invalid token" errors even though my API key looks correct?
 
 A `401 Unauthorized` or "无效的令牌 / invalid token" response usually means the **API Key does not match the domain** it is being sent to — for example, a key issued on the global site being used against the China-domestic endpoint `api.agnes-ai.cn` (or the reverse). Different keys are issued for different sites, so the wrong domain rejects the token.

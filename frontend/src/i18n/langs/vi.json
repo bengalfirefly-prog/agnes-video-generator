@@ -526,6 +526,7 @@
   "fbCollapsedHint": "Still failing after multiple retries? Report the issue",
   "fbExpandedHint": "Still failing after {n} retries. Please report with diagnostic info.",
   "fbDeterministicHint": "This looks like a deterministic issue caused by parameters or content. Retrying may not help.",
+  "fbNetworkHint": "Đây là lỗi mạng hoặc phân giải DNS trên máy của bạn: phía máy chủ thường đã tạo xong, chỉ là máy này không tải được kết quả. Hãy dùng DNS phân giải được tên miền đó (ví dụ 223.5.5.5 hoặc 119.29.29.29), tắt can thiệp DNS của VPN/proxy và phần mềm bảo mật, rồi thử lại để tiếp tục từ bước thất bại.",
   "fbDiagTitle": "Diagnostic Info",
   "fbCopy": "Copy Diagnostic Info",
   "fbCopied": "Copied. Please paste it into the GitHub Issue.",

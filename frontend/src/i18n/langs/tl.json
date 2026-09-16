@@ -526,6 +526,7 @@
   "fbCollapsedHint": "Still failing after multiple retries? Report the issue",
   "fbExpandedHint": "Still failing after {n} retries. Please report with diagnostic info.",
   "fbDeterministicHint": "This looks like a deterministic issue caused by parameters or content. Retrying may not help.",
+  "fbNetworkHint": "Problema ito ng network o DNS resolution sa computer mo: kumpleto na karaniwan ang gawa sa server, pero hindi makuha ng makina na ito ang resulta. Gumamit ng DNS na kayang i-resolve ang domain na iyan (halimbawa 223.5.5.5 o 119.29.29.29), i-off ang DNS hijack ng VPN/proxy at security software, tapos subukang muli para magpatuloy sa hakbang na nabigo.",
   "fbDiagTitle": "Diagnostic Info",
   "fbCopy": "Copy Diagnostic Info",
   "fbCopied": "Copied. Please paste it into the GitHub Issue.",

@@ -122,12 +122,41 @@ const DETERMINISTIC_PATTERNS: RegExp[] = [
 ]
 
 /**
+ * 本机网络 / 域名解析故障的匹配模式（v6.4.8）。
+ *
+ * 来源：issue #56 / #57 —— 用户本机解析不了输出文件域名
+ * `cos-platform-outputs.agnes-ai.cn`，服务端已生成成功，只差下载这一步，
+ * 表现为 `socket.gaierror [Errno 11004] getaddrinfo failed`。
+ * 这类故障重试同样无效，但引导是「查 DNS / 代理 / 安全软件」而非「反馈开发者」，
+ * 因此与 DETERMINISTIC_PATTERNS 分开维护。
+ */
+const LOCAL_NETWORK_PATTERNS: RegExp[] = [
+  /\bgetaddrinfo\b/i,
+  /nameresolutionerror/i,
+  /name resolution/i,
+  /nodename nor servname provided/i,
+  /\[errno 11004\]/i,
+  /cannot connect to proxy/i,
+  /tunnel connection failed/i,
+  /connection refused/i,
+  /无法解析域名|网络诊断|域名解析失败/,
+]
+
+/**
  * 判断错误消息是否为确定性故障（重试大概率无效）。
  * 误判只影响引导顺序，用户始终可手动重试与反馈。
  */
 export function isDeterministicError(message: string): boolean {
   if (!message) return false
   return DETERMINISTIC_PATTERNS.some((p) => p.test(message))
+}
+
+/**
+ * 判断错误消息是否为本机网络 / 域名解析故障（重试无效，需用户自查网络环境）。
+ */
+export function isLocalNetworkError(message: string): boolean {
+  if (!message) return false
+  return LOCAL_NETWORK_PATTERNS.some((p) => p.test(message))
 }
 
 // ── 诊断信息报告 ──

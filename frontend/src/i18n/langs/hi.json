@@ -526,6 +526,7 @@
   "fbCollapsedHint": "Still failing after multiple retries? Report the issue",
   "fbExpandedHint": "Still failing after {n} retries. Please report with diagnostic info.",
   "fbDeterministicHint": "This looks like a deterministic issue caused by parameters or content. Retrying may not help.",
+  "fbNetworkHint": "यह आपके कंप्यूटर का नेटवर्क या DNS समस्या है: सर्वर पर काम आमतौर पर पूरा हो चुका है, बस यह मशीन परिणाम फ़ाइल नहीं ला पा रही है। ऐसा DNS इस्तेमाल करें जो इस डोमेन को हल कर सके (जैसे 223.5.5.5 या 119.29.29.29), VPN/प्रॉक्सी और सुरक्षा सॉफ़्टवेयर का DNS हस्तक्षेप बंद करें, फिर विफल चरण से जारी रखने के लिए पुनः प्रयास करें।",
   "fbDiagTitle": "Diagnostic Info",
   "fbCopy": "Copy Diagnostic Info",
   "fbCopied": "Copied. Please paste it into the GitHub Issue.",

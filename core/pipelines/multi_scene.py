@@ -23,6 +23,7 @@ from typing import Callable, List, Optional
 from core.api.agnes_video import VideoTaskCancelled, is_remote_video_failure
 from core.pipelines import BasePipeline, CheckpointPause, PipelineShutdown
 from models.task import SceneTask, StepStatus
+from utils.network import describe_network_error
 
 logger = logging.getLogger(__name__)
 
@@ -151,16 +152,34 @@ class MultiScenePipeline(BasePipeline):
             logger.info("[MultiScene] Task %s paused: %s", self.task_id, e.message)
             return ""
         except PipelineShutdown:
-            await self._emit("error", "failed", "任务已被中断，可从任务列表续传", _PROGRESS_FAILED)
+            await self._emit(
+                "error", "failed", "任务已被中断，可从任务列表续传", _PROGRESS_FAILED,
+                preserve_step=True,
+            )
             raise
         except Exception as e:
+            # 网络 / 域名解析类故障翻译成可自助排查的提示（issue #56/#57：此前只抛
+            # RetryError[...]，用户看不出是本机 DNS 问题，反复点「重试任务」无效）
+            message = describe_network_error(e) or str(e)
+            failed_step = self._state.current_step if self._state else ""
             # 持久化完整 traceback，供诊断端点/前端反馈报告暴露（定位环境级异常如 [WinError 2]）
             self._state.status = StepStatus.FAILED
             self.task_manager.update_state(
                 status=StepStatus.FAILED,
                 error_traceback=traceback.format_exc(),
+                # 失败即落盘真实环节 + 可读消息：诊断报告的「失败环节」不再依赖前端
+                # 挂载时的快照，也不会因进度写盘节流而停留在很久以前的旧值
+                current_step=failed_step,
+                current_status="failed",
+                current_message=message,
             )
-            await self._emit("error", "failed", str(e), _PROGRESS_FAILED)
+            logger.error(
+                "[MultiScene] Task %s failed at step '%s': %s",
+                self.task_id, failed_step, e,
+            )
+            await self._emit(
+                "error", "failed", message, _PROGRESS_FAILED, preserve_step=True
+            )
             raise
 
     # ==================================================================

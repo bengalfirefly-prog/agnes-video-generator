@@ -10,7 +10,7 @@ import StepTimeline from './StepTimeline.vue'
 import ArtifactCard from './ArtifactCard.vue'
 import CheckpointDetail from './CheckpointDetail.vue'
 import FeedbackPanel from './FeedbackPanel.vue'
-import { isDeterministicError } from '@/utils/feedback'
+import { isDeterministicError, isLocalNetworkError } from '@/utils/feedback'
 
 const {
   progressPct,
@@ -21,6 +21,7 @@ const {
   stepStates,
   taskFailed,
   failedMessage,
+  liveFailedStep,
   awaitingCheckpoint,
   retryCount,
   connectionLost,
@@ -157,7 +158,18 @@ const feedbackConfigs = computed(() =>
 )
 
 // v6.1 问题反馈：错误是否为确定性故障（命中则切换引导文案 + 弱化重试按钮）
-const deterministicError = computed(() => isDeterministicError(failedMessage.value))
+// v6.4.8：本机网络/域名解析故障单列一类，引导是「查 DNS/代理」，不套参数类文案
+const networkError = computed(() => isLocalNetworkError(failedMessage.value))
+const deterministicError = computed(
+  () => !networkError.value && isDeterministicError(failedMessage.value),
+)
+// 两类「重试大概率无效」的故障：统一弱化重试按钮
+const retryIneffective = computed(() => networkError.value || deterministicError.value)
+
+// 诊断报告的失败环节：优先后端实时环节名，回退页面挂载时的快照（issue #56/#57）
+const reportFailedStep = computed(
+  () => liveFailedStep.value || taskInfo.value?.current_step || '',
+)
 
 onMounted(async () => {
   const taskId = appState.progressTaskId
@@ -218,14 +230,14 @@ onUnmounted(() => {
             <p class="text-muted text-xs">{{ failedMessage || t('genFailedMsg') }}</p>
             <!-- v6.1 问题反馈：重试引导（偶发故障优先断点续传自愈，多次失败再上报） -->
             <div class="pt-2 border-t border-red-800/60 space-y-2">
-              <!-- 引导文案：确定性故障切换为「重试可能无效」 -->
-              <p class="text-xs leading-relaxed" :class="deterministicError ? 'text-amber-400' : 'text-muted'">
-                {{ deterministicError ? t('fbDeterministicHint') : t('fbRetryHint') }}
+              <!-- 引导文案：网络/域名类 → 自查环境；确定性故障 → 建议直接反馈；其余 → 断点续传自愈 -->
+              <p class="text-xs leading-relaxed" :class="retryIneffective ? 'text-amber-400' : 'text-muted'">
+                {{ networkError ? t('fbNetworkHint') : deterministicError ? t('fbDeterministicHint') : t('fbRetryHint') }}
               </p>
               <div class="flex items-center gap-3 flex-wrap">
                 <button
                   class="text-xs px-3 py-1.5 transition rounded-lg"
-                  :class="deterministicError ? 'bg-paper-2/40 border border-rule text-muted hover:text-ink-2' : 'bg-accent text-accent-ink hover:opacity-90'"
+                  :class="retryIneffective ? 'bg-paper-2/40 border border-rule text-muted hover:text-ink-2' : 'bg-accent text-accent-ink hover:opacity-90'"
                   @click="onRetryTask"
                 >
                   ↻ {{ t('fbRetryBtn') }}
@@ -238,7 +250,7 @@ onUnmounted(() => {
                 :task-id="appState.progressTaskId"
                 :task-type="appState.currentTaskType || 'creative'"
                 :mode="taskInfo?.mode"
-                :failed-step="taskInfo?.current_step || ''"
+                :failed-step="reportFailedStep"
                 :error-message="failedMessage || ''"
                 :retry-count="retryCount"
                 :configs="feedbackConfigs"

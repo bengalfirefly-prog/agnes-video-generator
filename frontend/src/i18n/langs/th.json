@@ -526,6 +526,7 @@
   "fbCollapsedHint": "Still failing after multiple retries? Report the issue",
   "fbExpandedHint": "Still failing after {n} retries. Please report with diagnostic info.",
   "fbDeterministicHint": "This looks like a deterministic issue caused by parameters or content. Retrying may not help.",
+  "fbNetworkHint": "นี่คือปัญหาเครือข่ายหรือการแยกชื่อโดเมนบนเครื่องของคุณ ฝั่งเซิร์ฟเวอร์มักสร้างเสร็จแล้ว แต่เครื่องนี้ดึงไฟล์ผลลัพธ์ไม่ได้ เปลี่ยนไปใช้ DNS ที่แยกโดเมนนี้ได้ (เช่น 223.5.5.5 หรือ 119.29.29.29) ปิดการครอบ DNS ของ VPN/พร็อกซีและซอฟต์แวร์รักษาความปลอดภัย แล้วลองใหม่งานจะเดินต่อจากขั้นตอนที่ล้มเหลว",
   "fbDiagTitle": "Diagnostic Info",
   "fbCopy": "Copy Diagnostic Info",
   "fbCopied": "Copied. Please paste it into the GitHub Issue.",

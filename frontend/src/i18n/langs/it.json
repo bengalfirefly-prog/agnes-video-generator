@@ -527,6 +527,7 @@
   "fbCollapsedHint": "Still failing after multiple retries? Report the issue",
   "fbExpandedHint": "Still failing after {n} retries. Please report with diagnostic info.",
   "fbDeterministicHint": "This looks like a deterministic issue caused by parameters or content. Retrying may not help.",
+  "fbNetworkHint": "È un problema di rete o di risoluzione DNS sul tuo computer: il server di solito ha già completato il lavoro, ma questa macchina non riesce a recuperare il file. Usa un DNS in grado di risolvere il dominio (ad esempio 223.5.5.5 o 119.29.29.29), disattiva l'interferenza DNS di VPN/proxy e software di sicurezza, quindi riprova per ripartire dal passaggio fallito.",
   "fbDiagTitle": "Diagnostic Info",
   "fbCopy": "Copy Diagnostic Info",
   "fbCopied": "Copied. Please paste it into the GitHub Issue.",

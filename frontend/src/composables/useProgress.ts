@@ -27,6 +27,10 @@ const steps = ref<StepDef[]>([])
 const stepStates = ref<Record<string, 'done' | 'running' | 'pending'>>({})
 const failedMessage = ref('')
 const taskFailed = ref(false)
+// v6.4.8：后端实时环节名（去掉 step_ 前缀）。诊断报告用它而非 taskInfo 快照，
+// 避免「同一页面点重试后环节名停留在上一轮」（issue #56/#57：报告 scene_config，
+// 实际失败在视频下载环节）。
+const liveFailedStep = ref('')
 // v6.0 手动模式：当前检查点（暂停等待用户操作时非空）
 const awaitingCheckpoint = ref('')
 // v6.1 问题反馈：当前任务的重试次数（驱动反馈区渐进展开）
@@ -91,6 +95,8 @@ async function showProgress(taskId: string, dirName?: string | null): Promise<Ta
     markCompletedStepsFromState(state)
     const step = (state.current_step || '').replace(/^step_/, '')
     const status = state.current_status || ''
+    // "error" 是终态事件名而非环节名（老数据会这么落盘），不覆盖实时环节
+    if (step && step !== 'error') liveFailedStep.value = step
     if (step && status === 'running') {
       markStep(step, 'running')
     }
@@ -200,6 +206,7 @@ function unmountProgressPage() {
   needsResume.value = false
   taskFailed.value = false
   retryCount.value = 0
+  liveFailedStep.value = ''
 }
 
 async function pollTaskProgress(taskId: string) {
@@ -222,6 +229,8 @@ async function pollTaskProgress(taskId: string) {
 
     const step = (state.current_step || '').replace(/^step_/, '')
     const status = state.current_status || ''
+    // "error" 是终态事件名而非环节名（老数据会这么落盘），不覆盖实时环节
+    if (step && step !== 'error') liveFailedStep.value = step
     if (step && status === 'running') {
       markStep(step, 'running')
     }
@@ -341,6 +350,7 @@ export function useProgress() {
     stepStates,
     taskFailed,
     failedMessage,
+    liveFailedStep,
     awaitingCheckpoint,
     needsResume,
     retryCount,

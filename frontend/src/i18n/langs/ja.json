@@ -527,6 +527,7 @@
   "fbCollapsedHint": "Still failing after multiple retries? Report the issue",
   "fbExpandedHint": "Still failing after {n} retries. Please report with diagnostic info.",
   "fbDeterministicHint": "This looks like a deterministic issue caused by parameters or content. Retrying may not help.",
+  "fbNetworkHint": "これはご利用のPC側のネットワーク／DNS解決の問題です。サーバー側では生成が完了しているのに、このマシンが結果ファイルを取得できていません。このドメインを解決できるDNS（例：223.5.5.5 や 119.29.29.29）に切り替え、VPN・プロキシやセキュリティソフトによるDNS介入を無効化してから再試行すると、失敗した工程から再開できます。",
   "fbDiagTitle": "Diagnostic Info",
   "fbCopy": "Copy Diagnostic Info",
   "fbCopied": "Copied. Please paste it into the GitHub Issue.",

@@ -527,6 +527,7 @@
   "fbCollapsedHint": "Still failing after multiple retries? Report the issue",
   "fbExpandedHint": "Still failing after {n} retries. Please report with diagnostic info.",
   "fbDeterministicHint": "This looks like a deterministic issue caused by parameters or content. Retrying may not help.",
+  "fbNetworkHint": "Ini masalah rangkaian atau penyelesaian DNS pada komputer anda: pelayan biasanya sudah selesai, tetapi mesin ini tidak dapat mengambil fail hasilnya. Tukar ke DNS yang dapat menyelesaikan domain tersebut (contohnya 223.5.5.5 atau 119.29.29.29), matikan campur tangan DNS oleh VPN/proksi dan perisian keselamatan, kemudian cuba semula untuk sambung daripada langkah yang gagal.",
   "fbDiagTitle": "Diagnostic Info",
   "fbCopy": "Copy Diagnostic Info",
   "fbCopied": "Copied. Please paste it into the GitHub Issue.",

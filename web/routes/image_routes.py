@@ -16,6 +16,7 @@ from core.config import API_KEY_MISSING_MSG, get_api_key
 from core.path_security import safe_join
 from core.task_manager import TaskManager
 from models.task import SimpleImageTask, StepStatus
+from utils.network import describe_network_error
 from web import helpers
 from web.log_safe import safe_log
 
@@ -95,20 +96,32 @@ async def generate_image(
             negative_prompt=negative_prompt,
         )
     except Exception as e:
+        message = describe_network_error(e) or str(e)
         state.status = StepStatus.FAILED
-        tm.update_state(status=StepStatus.FAILED)
+        tm.update_state(
+            status=StepStatus.FAILED,
+            current_step="generate",
+            current_status="failed",
+            current_message=message,
+        )
         logger.error(f"[Image] Task {task_id} failed: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=message)
 
     img_filename = "final_image.png"
     img_path = os.path.join(tm.task_dir, img_filename)
     try:
         await output.save(img_path)
     except Exception as e:
+        message = describe_network_error(e) or str(e)
         state.status = StepStatus.FAILED
-        tm.update_state(status=StepStatus.FAILED)
+        tm.update_state(
+            status=StepStatus.FAILED,
+            current_step="save",
+            current_status="failed",
+            current_message=f"图片保存失败: {message}",
+        )
         logger.error(f"[Image] Task {task_id} save failed: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"图片保存失败: {e}")
+        raise HTTPException(status_code=500, detail=f"图片保存失败: {message}")
 
     state.status = StepStatus.COMPLETED
     state.final_video_file = img_path

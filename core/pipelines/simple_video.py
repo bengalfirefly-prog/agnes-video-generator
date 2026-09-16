@@ -14,6 +14,7 @@ from core.api.agnes_video import AgnesVideoAPI
 from core.config import DEFAULT_TEXT_MODEL
 from core.pipelines import BasePipeline, PipelineShutdown
 from models.task import SimpleVideoTask, StepStatus
+from utils.network import describe_network_error
 
 logger = logging.getLogger(__name__)
 
@@ -73,16 +74,29 @@ class SimpleVideoPipeline(BasePipeline):
 
         except PipelineShutdown as e:
             logger.info(f"[Simple] Shutdown: {e}")
-            await self._emit("error", "failed", "任务已被中断，可从任务列表续传", _PROGRESS_FAILED)
+            await self._emit(
+                "error", "failed", "任务已被中断，可从任务列表续传", _PROGRESS_FAILED,
+                preserve_step=True,
+            )
             raise
         except Exception as e:
+            # 网络 / 域名解析类故障翻译成可自助排查的提示（issue #56/#57）
+            message = describe_network_error(e) or str(e)
+            failed_step = self._state.current_step if self._state else ""
             # 持久化完整 traceback，供诊断端点/前端反馈报告暴露（定位环境级异常如 [WinError 2]）
             self._state.status = StepStatus.FAILED
             self.task_manager.update_state(
                 status=StepStatus.FAILED,
                 error_traceback=traceback.format_exc(),
+                # 失败即落盘真实环节 + 可读消息，避免诊断报告归因停留在旧快照
+                current_step=failed_step,
+                current_status="failed",
+                current_message=message,
             )
-            await self._emit("error", "failed", str(e), _PROGRESS_FAILED)
+            logger.error("[Simple] Task %s failed at step '%s': %s", self.task_id, failed_step, e)
+            await self._emit(
+                "error", "failed", message, _PROGRESS_FAILED, preserve_step=True
+            )
             raise
 
     # ------------------------------------------------------------------

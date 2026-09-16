@@ -526,6 +526,7 @@
   "fbCollapsedHint": "Still failing after multiple retries? Report the issue",
   "fbExpandedHint": "Still failing after {n} retries. Please report with diagnostic info.",
   "fbDeterministicHint": "This looks like a deterministic issue caused by parameters or content. Retrying may not help.",
+  "fbNetworkHint": "Bu, kendi bilgisayarınızdaki bir ağ veya DNS çözümleme sorunu: sunucu işlemi genellikle bitirmiştir, ancak bu makine sonucu indiremiyor. Bu alan adını çözebilecek bir DNS kullanın (ör. 223.5.5.5 veya 119.29.29.29), VPN/proksi ve güvenlik yazılımlarının DNS müdahalesini kapatın, ardından başarısız adımdan devam etmek için yeniden deneyin.",
   "fbDiagTitle": "Diagnostic Info",
   "fbCopy": "Copy Diagnostic Info",
   "fbCopied": "Copied. Please paste it into the GitHub Issue.",

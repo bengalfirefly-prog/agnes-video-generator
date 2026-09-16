@@ -527,6 +527,7 @@
   "fbCollapsedHint": "Still failing after multiple retries? Report the issue",
   "fbExpandedHint": "Still failing after {n} retries. Please report with diagnostic info.",
   "fbDeterministicHint": "This looks like a deterministic issue caused by parameters or content. Retrying may not help.",
+  "fbNetworkHint": "이 오류는 사용자의 PC 네트워크 또는 DNS 해석 문제입니다. 서버에서는 이미 생성이 끝났지만 이 기기에서 결과 파일을 가져오지 못하는 것입니다. 해당 도메인을 해석할 수 있는 DNS(예: 223.5.5.5 또는 119.29.29.29)로 바꾸고 VPN/프록시 및 보안 소프트웨어의 DNS 차단을 끈 뒤 재시도하면 실패한 단계에서 이어집니다.",
   "fbDiagTitle": "Diagnostic Info",
   "fbCopy": "Copy Diagnostic Info",
   "fbCopied": "Copied. Please paste it into the GitHub Issue.",

@@ -534,6 +534,7 @@
   "fbCollapsedHint": "多次重试仍未解决？反馈问题",
   "fbExpandedHint": "已重试 {n} 次仍未解决，请携带诊断信息反馈",
   "fbDeterministicHint": "该错误可能是参数或内容导致的确定性问题，重试可能无效，建议直接反馈",
+  "fbNetworkHint": "本机网络或域名解析异常：服务端通常已生成完成，只是这台机器取不回结果。请先检查 DNS（换成 223.5.5.5 或 119.29.29.29）、代理/VPN 的 DNS 劫持与安全软件拦截，再点重试续传",
   "fbDiagTitle": "诊断信息",
   "fbCopy": "复制诊断信息",
   "fbCopied": "已复制，请粘贴到 GitHub Issue 中",
