@@ -603,6 +603,12 @@ def _text_diff_summary(old: str, new: str) -> str:
     return f"改动摘要：新增 {added} 行，删除 {removed} 行（字符数 {len(old)} → {len(new)}）"
 
 
+def _read_file_b64(path: str) -> str:
+    """同步读取文件并返回 base64 文本（供 to_thread 在线程池执行）。"""
+    with open(path, "rb") as f:
+        return base64.b64encode(f.read()).decode("utf-8")
+
+
 async def _image_output_to_data_url(output) -> str:
     """将 ImageOutput 转为 base64 data URL（url / b64 两种 fmt 兼备）。"""
     ext = (getattr(output, "ext", None) or "png").lower()
@@ -617,8 +623,7 @@ async def _image_output_to_data_url(output) -> str:
     os.close(fd)
     try:
         await output.save(tmp)
-        with open(tmp, "rb") as f:
-            b64 = base64.b64encode(f.read()).decode("utf-8")
+        b64 = await asyncio.to_thread(_read_file_b64, tmp)
         return f"data:{mime};base64,{b64}"
     finally:
         try:
