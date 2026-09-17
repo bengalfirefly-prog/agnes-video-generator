@@ -16,6 +16,7 @@
 | R1 | [character_consistency_and_dialogue.md](character_consistency_and_dialogue.md) | 角色一致性增强 + 对话（对白）支持 | 角色一致性现状已较完善（边际收益低）；对话支持口型缺口大、实现代价高，暂缓 | 2026-08-13 | **拆分处置**：chained 双参考图小项转入合并版路线图 §3.6；对话支持主体继续存档——复查触发条件：Agnes 视频模型支持对白口型同步，或产品定位转向接受无口型的形态（广播剧/有声短剧风格） |
 | R2 | [tts_research_report.md](tts_research_report.md) | TTS 选型调研（Kokoro/MeloTTS/CosyVoice 替代 edge_tts） | 结论建议集成 Kokoro-82M，但 D8 决定不引入付费/自建 TTS，保留 edge_tts；方案未实施，存档待复查 | 2026-08-13 | **继续存档（倾向维持现状）**：切换会使字幕从词级时间戳真值倒退为句级；音色少痛点已被动态音色目录化解；与 D8 决策冲突。复查触发条件：edge_tts 出现持续性封禁/限流导致批量失败，或出现明确的离线部署刚需（届时以可选插件引擎而非默认替换重启评估） |
 | R3 | [arabic_pr_followup.md](arabic_pr_followup.md) | PR #32 阿语支持遗留瑕疵（`_ARABIC_RE` 含 U+FEFF）+ 以其为模板补齐 tr/vi/th/tl/hi/fa/bn/ur 共 8 种 UI 语言缺口 | PR #32 刚合并（master `db33d23`/`e8c31fa`），先观察阿语链路稳定性；语言补齐未排期 | 2026-08-29 | **✅ 已实施（2026-08-30）**：A 节 `_ARABIC_RE` 排除 U+FEFF；B 节 8 种语言后端链路全量补齐（音色/试听/脚本检测/字幕字体/RTL），见存档文档各节「实施记录」；存档保留作实施依据 |
+| R4 | [anna_platform_adaptation.md](anna_platform_adaptation.md) | 改造适配 Anna 平台（Anna App = Executa 工具集 + Skill + iframe UI bundle） | 改造本质是交付形态 + 运行时模型 + 存储与凭据体系的整体重写（≈33–52 人日）；且 **Anna 无视频生成能力**，改造后用户仍需自备 Agnes Key，免费卖点反而削弱 | 2026-09-16 | **继续存档**：技术路径清晰但性价比取决于 6 个平台侧未知量（出网权限、invoke 超时上限、CPU/内存配额、APS 配额、cloud-storage 边界、并发门禁）。复查触发条件：Anna 上线视频类宿主能力 / 生态出现可复刻的同类长时任务 App / 项目定位转向放弃自部署 |
 
 > 2026-08-26 全项目架构评审对两条存档做了重新评定，结论已并入 `../v6.0/optimization_roadmap.md`「遗留条目处置」一节；存档文档本身按流转规则保留不删。
 
