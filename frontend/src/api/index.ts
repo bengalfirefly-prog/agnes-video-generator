@@ -162,6 +162,15 @@ export function submitSimple(form: FormData) {
 export function submitCreative(form: FormData) {
   return fetch('/api/tasks/creative', { method: 'POST', body: form }).then((r) => r.json())
 }
+// ── 创意脚本预览（简易模式：输入主题 → 出分镜）──
+export function creativePreview(idea: string, contentLang: string, sceneCount: number) {
+  const form = new FormData()
+  form.append('idea', idea)
+  form.append('content_lang', contentLang)
+  form.append('scene_count', String(sceneCount))
+  form.append('scene_durations_json', JSON.stringify(Array(sceneCount).fill(5)))
+  return request('/api/creative/preview-script', { method: 'POST', body: form })
+}
 export function submitManuscript(form: FormData) {
   return fetch('/api/tasks/manuscript', { method: 'POST', body: form }).then((r) => r.json())
 }

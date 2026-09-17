@@ -11,6 +11,7 @@ import { useNavigation } from '@/composables/useNavigation'
 import { appState } from '@/store'
 import ConfigPanel from '@/components/ConfigPanel.vue'
 import CreatePanel from '@/components/CreatePanel.vue'
+import SimplePanel from '@/components/SimplePanel.vue'
 import TaskListPanel from '@/components/TaskListPanel.vue'
 import ProgressPage from '@/components/ProgressPage.vue'
 import VoicePickerModal from '@/components/VoicePickerModal.vue'
@@ -25,9 +26,9 @@ const { initVoiceSelector } = useVoice()
 const { loadTaskList, startTaskListTimer, stopTaskListTimer } = useTasks()
 const { parseHash } = useNavigation()
 
-function switchMainTab(tab: 'create' | 'list') {
+function switchMainTab(tab: 'create' | 'list' | 'simple') {
   appState.view = tab
-  location.hash = tab === 'list' ? '#/list' : '#/create'
+  location.hash = tab === 'list' ? '#/list' : tab === 'simple' ? '#/simple' : '#/create'
   if (tab === 'list') {
     loadTaskList()
     startTaskListTimer()
@@ -182,11 +183,23 @@ async function autoReconnectRunningTask() {
         >
           {{ t('tabList') }}
         </button>
+        <button
+          class="px-5 py-2.5 rounded-lg text-sm font-medium transition"
+          :class="appState.view === 'simple' ? 'tab-active' : 'tab-inactive'"
+          @click="switchMainTab('simple')"
+        >
+          {{ t('tabSimple') }}
+        </button>
       </div>
 
       <!-- Create Panel -->
       <div v-show="appState.view === 'create'">
         <CreatePanel />
+      </div>
+
+      <!-- Simple Panel -->
+      <div v-show="appState.view === 'simple'">
+        <SimplePanel @go-list="switchMainTab('list')" />
       </div>
 
       <!-- List Panel -->
