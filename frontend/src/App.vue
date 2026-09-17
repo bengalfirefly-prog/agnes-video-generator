@@ -185,7 +185,7 @@ async function autoReconnectRunningTask() {
         </button>
         <button
           class="px-5 py-2.5 rounded-lg text-sm font-medium transition"
-          :class="appState.view === 'simple' ? 'tab-active' : 'tab-inactive'"
+          :class="appState.view === 'simple' ? 'tab-featured-active' : 'tab-featured'"
           @click="switchMainTab('simple')"
         >
           {{ t('tabSimple') }}
