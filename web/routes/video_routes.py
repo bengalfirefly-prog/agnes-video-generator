@@ -1,14 +1,20 @@
 """视频下载 + 中间产物管理路由。"""
 from __future__ import annotations
 
+import asyncio
+import base64
 import json
 import logging
+import mimetypes
 import os
 import shutil
+import tempfile
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 
+from core.api.agnes_chat import AgnesChatAPI
+from core.api.agnes_image import AgnesImageAPI
 from core.artifacts import (
     apply_cascade_plan,
     build_checkpoint_manifest,
@@ -18,11 +24,12 @@ from core.artifacts import (
     write_checkpoint_manifest,
 )
 from core.async_io import read_text, write_bytes
-from core.config import get_working_dir
+from core.config import API_KEY_MISSING_MSG, get_api_key, get_working_dir
 from core.dependency_graph import get_dependency_graph
 from core.path_security import UnsafePathError, safe_join
 from core.task_manager import TaskManager
 from models.task import StepStatus
+from utils.network import describe_network_error
 from web import app_state, helpers
 from web.log_safe import safe_log
 
@@ -577,3 +584,150 @@ async def regen_checkpoint(task_id: str, checkpoint: str):
         param_updates="",
         confirmed=True,
     )
+
+
+_TEXT_CATEGORIES = {"json", "subtitle", "text"}
+_IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp"}
+
+
+def _text_diff_summary(old: str, new: str) -> str:
+    """轻量文本改动摘要（行级差量 + 字符数变化），不依赖外部 diff 库。"""
+    old_lines = [l for l in old.splitlines() if l.strip()]
+    new_lines = [l for l in new.splitlines() if l.strip()]
+    if old_lines == new_lines:
+        if old != new:
+            return f"内容有变化（字符数 {len(old)} → {len(new)}）"
+        return "未检测到内容变化"
+    added = sum(1 for l in new_lines if l not in set(old_lines))
+    removed = sum(1 for l in old_lines if l not in set(new_lines))
+    return f"改动摘要：新增 {added} 行，删除 {removed} 行（字符数 {len(old)} → {len(new)}）"
+
+
+async def _image_output_to_data_url(output) -> str:
+    """将 ImageOutput 转为 base64 data URL（url / b64 两种 fmt 兼备）。"""
+    ext = (getattr(output, "ext", None) or "png").lower()
+    mime = mimetypes.guess_type(f"x.{ext}")[0] or "image/png"
+    if getattr(output, "fmt", None) == "b64":
+        raw = output.data
+        if "," in raw:
+            raw = raw.split(",", 1)[1]
+        return f"data:{mime};base64,{raw}"
+    # fmt == "url"：下载到临时文件再读回 base64
+    fd, tmp = tempfile.mkstemp(suffix=f".{ext}")
+    os.close(fd)
+    try:
+        await output.save(tmp)
+        with open(tmp, "rb") as f:
+            b64 = base64.b64encode(f.read()).decode("utf-8")
+        return f"data:{mime};base64,{b64}"
+    finally:
+        try:
+            os.remove(tmp)
+        except OSError:
+            pass
+
+
+@router.post("/api/tasks/{task_id}/checkpoints/{checkpoint}/ai-modify")
+async def ai_modify_artifact(
+    task_id: str,
+    checkpoint: str,
+    artifact_id: str = Form(...),
+    user_request: str = Form(...),
+):
+    """通道 1：页内 AI 修改（文本 / 图片产物，PRD §5.2 / §4.7）。
+
+    读取目标产物 → 按类型调模型改写 → 返回新内容（**不落盘、不改 state**）；
+    前端预览 / 微调后经 ``upload`` 落盘，再走 ``approve`` 重置下游并恢复执行。
+    视频 / 音频产物暂不支持，返回 400。
+    """
+    if not user_request.strip():
+        raise HTTPException(status_code=422, detail="user_request 不能为空")
+
+    # 运行中保护
+    if task_id in app_state.active_pipelines:
+        pipeline = app_state.active_pipelines[task_id]
+        if not pipeline._stop_event.is_set():
+            raise HTTPException(status_code=409, detail="Task is running, please stop/pause it first")
+
+    dir_name = helpers.find_dir_name(task_id)
+    tm = TaskManager(task_id, dir_name=dir_name)
+    state = tm.load()
+    if not state:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    artifact = resolve_artifact(artifact_id, state, tm.task_dir)
+    if not artifact or not artifact.file_relpath:
+        raise HTTPException(status_code=404, detail="Artifact not found")
+    if not artifact.deletable:
+        raise HTTPException(status_code=400, detail="Artifact is not editable")
+
+    # 路径穿越防护
+    real_task_dir = os.path.realpath(tm.task_dir)
+    abs_path = os.path.join(tm.task_dir, artifact.file_relpath)
+    real_abs_path = os.path.realpath(abs_path)
+    if not real_abs_path.startswith(real_task_dir + os.sep):
+        raise HTTPException(status_code=403, detail="Access denied")
+    if not os.path.exists(real_abs_path) or not os.path.isfile(real_abs_path):
+        raise HTTPException(status_code=404, detail="Artifact file not found")
+
+    api_key = get_api_key()
+    if not api_key:
+        raise HTTPException(status_code=400, detail=API_KEY_MISSING_MSG)
+
+    category = artifact.category
+    try:
+        if category in _TEXT_CATEGORIES:
+            raw = await read_text(real_abs_path)
+            chat_api = AgnesChatAPI(api_key=api_key)
+            if category == "json":
+                parsed = await asyncio.to_thread(
+                    chat_api.chat_json,
+                    "你是资深视频分镜/编剧编辑器。必须严格保持 JSON 结构与既有字段，"
+                    "只按用户要求修改目标字段，禁止新增/删除顶层字段，禁止破坏 JSON 合法性。",
+                    f"以下是现有 JSON：\n{raw}\n\n用户要求：{user_request}\n请直接输出修改后的完整 JSON。",
+                )
+                new_content = json.dumps(parsed, ensure_ascii=False, indent=2)
+            else:
+                new_content = await asyncio.to_thread(
+                    chat_api.chat,
+                    "你是资深视频文案/字幕编辑器。保持原格式（SRT 序号与时间轴格式不变、"
+                    "文本分段不变），只按用户要求修改内容，输出完整改写结果。",
+                    f"以下是现有内容：\n{raw}\n\n用户要求：{user_request}\n请直接输出修改后的完整内容。",
+                )
+            diff_summary = _text_diff_summary(raw, new_content)
+        elif os.path.splitext(artifact.file_relpath)[1].lower() in _IMAGE_EXTS:
+            chat_api = AgnesChatAPI(api_key=api_key)
+            edit_prompt = await asyncio.to_thread(
+                chat_api.chat_multimodal,
+                "你是资深图像编辑。基于用户意见，输出一条简洁的中文改写要求，"
+                "用于图像编辑模型基于该图重生成。只输出修改要求本身，不超过 150 字。",
+                f"用户希望修改这幅图：{user_request}\n请输出修改要求本身。",
+                [real_abs_path],
+            )
+            image_api = AgnesImageAPI(api_key=api_key)
+            output = await image_api.generate_single_image(
+                prompt=edit_prompt.strip(),
+                reference_image_paths=[real_abs_path],
+            )
+            new_content = await _image_output_to_data_url(output)
+            diff_summary = f"AI 已基于原图生成新版：{edit_prompt.strip()[:120]}"
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail=f"该产物类型（{category}）暂不支持 AI 修改，请使用「在线编辑」或「自行处理」通道",
+            )
+    except HTTPException:
+        raise
+    except Exception as e:
+        message = describe_network_error(e) or f"AI 修改失败：{e}"
+        raise HTTPException(status_code=502, detail=message)
+
+    logger.info("[AiModify] %s task %s checkpoint '%s' (category=%s)",
+                safe_log(artifact_id), safe_log(task_id), safe_log(checkpoint), category)
+    return {
+        "ok": True,
+        "artifact_id": artifact_id,
+        "category": category,
+        "new_content": new_content,
+        "diff_summary": diff_summary,
+    }

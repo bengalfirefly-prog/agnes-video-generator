@@ -57,28 +57,89 @@ async function loadCheckpoint() {
 }
 loadCheckpoint()
 
-// ── 通道 1：AI 帮我改（P1 已实现后端；ai-modify 为 P1.5，此处先做前端调用适配）──
+// ── 通道 1：AI 帮我改（文本 / 图片产物；视频/音频不支持）──
+const aiSupportedCategories = ['text', 'json', 'subtitle']
+const aiImageExts = ['.png', '.jpg', '.jpeg', '.webp', '.gif', '.bmp']
+function isAiModifiable(a: any): boolean {
+  const cat = String(a.category || '')
+  const rel = String(a.file_relpath || a.path || '')
+  const ext = rel.slice(rel.lastIndexOf('.')).toLowerCase()
+  return (
+    a.editable !== false && a.deletable !== false && a.exists !== false &&
+    (aiSupportedCategories.includes(cat) || cat === 'image' || aiImageExts.includes(ext))
+  )
+}
+const aiModifiableArts = computed(() =>
+  (checkpointData.value?.artifacts || []).filter((a: any) => isAiModifiable(a)),
+)
+
 async function runAiModify() {
   const req = aiRequest.value.trim()
   if (!req) return
+  const target = aiModifiableArts.value[0]
+  if (!target) {
+    showToast(t('noEditableArtifact'), 3500)
+    return
+  }
   aiLoading.value = true
   aiResult.value = null
   try {
-    // 当前检查点第一个可编辑产物作为修改目标（简化：通道 1 一期由产物矩阵驱动）
-    // 兼容 manifest 字段（editable）与 artifacts 接口字段（deletable）
-    const arts = (checkpointData.value?.artifacts || []).filter(
-      (a: any) => a.editable !== false && a.deletable !== false && a.exists !== false,
-    )
-    const target = arts[0]
-    if (!target) throw new Error(t('noEditableArtifact'))
-    // 先按 impact 预计算
-    const imp = await api.getImpact(props.taskId, props.checkpoint, [target.artifact_id])
-    impactData.value = imp
-    aiResult.value = { target: target.artifact_id, preview: null }
+    const d = await api.aiModify(props.taskId, props.checkpoint, target.artifact_id, req)
+    if (!d.ok) throw new Error(d.detail || t('aiModifyFailed'))
+    const isImage = d.category === 'image'
+    // 原内容（文本取其内容做 diff；图片直接引文件 URL 预览）
+    let originText = ''
+    const originUrl = api.getArtifactFileUrl(props.taskId, target.artifact_id)
+    if (!isImage) {
+      try {
+        const r = await fetch(originUrl)
+        if (r.ok) originText = await r.text()
+      } catch {
+        /* 原内容拉取失败则留空 */
+      }
+    }
+    aiResult.value = {
+      target: target.artifact_id,
+      category: d.category,
+      isImage,
+      new_content: d.new_content as string,
+      diff_summary: d.diff_summary as string,
+      originText,
+      originUrl,
+    }
+    // 影响预计算（修改前提示）
+    impactData.value = await api.getImpact(props.taskId, props.checkpoint, [target.artifact_id])
   } catch (e: any) {
     showToast(e.message || t('aiModifyFailed'), 4500)
   } finally {
     aiLoading.value = false
+  }
+}
+
+function dataUrlToFile(dataUrl: string, name: string): Promise<File> {
+  return fetch(dataUrl)
+    .then((r) => r.blob())
+    .then((b) => new File([b], name))
+}
+
+// 应用 AI 修改并继续：文本/图片 → 覆盖落盘（upload）→ approve 重置下游 + 恢复执行
+async function applyAiAndContinue() {
+  const res = aiResult.value
+  if (!res?.target) return
+  confirming.value = true
+  try {
+    if (res.new_content) {
+      const file = res.isImage
+        ? await dataUrlToFile(res.new_content as string, res.target + '.png')
+        : new File([res.new_content as string], res.target + '.txt', { type: 'text/plain;charset=utf-8' })
+      const up = await api.uploadArtifact(props.taskId, res.target, file)
+      if (!up.ok) throw new Error(up.detail || t('artifactSaveFailed'))
+    }
+    await doApprove([res.target])
+  } catch (e: any) {
+    showToast(e.message || t('failContinue'), 4500)
+  } finally {
+    confirming.value = false
   }
 }
 
@@ -116,14 +177,20 @@ async function continueAfterConfirm() {
 
 // ── 统一继续按钮：无论是否修改，走同一 approve 逻辑。
 //   根据当前通道自动收集修改产物：
-//     - 通道 1（AI 修改完成）→ 携带 AI 修改目标产物
+//     - 通道 1（AI 修改）→ 若已生成结果则先落盘再审批；未生成则直接确认
 //     - 通道 4（在线编辑已保存）→ 携带已保存的产物
 //     - 其余 → 无修改，直接确认继续
 async function continueTask() {
+  if (activeCard.value === 'ai') {
+    if (aiResult.value?.target) {
+      await applyAiAndContinue()
+      return
+    }
+    await doApprove([])
+    return
+  }
   let modified: string[] = []
-  if (activeCard.value === 'ai' && aiResult.value?.target) {
-    modified = [aiResult.value.target]
-  } else if (activeCard.value === 'edit') {
+  if (activeCard.value === 'edit') {
     modified = Object.keys(savedMap.value).filter((id) => savedMap.value[id])
   }
   await doApprove(modified)
@@ -266,7 +333,7 @@ function artLabel(a: any): string {
 
     <!-- 四卡片 -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
-      <button class="p-3 rounded-xl border text-left transition" :class="activeCard === 'ai' ? 'border-accent bg-accent/10' : 'border-rule bg-paper-2/30 hover:border-accent/40'" @click="activeCard = 'ai'">
+      <button v-if="aiModifiableArts.length" class="p-3 rounded-xl border text-left transition" :class="activeCard === 'ai' ? 'border-accent bg-accent/10' : 'border-rule bg-paper-2/30 hover:border-accent/40'" @click="activeCard = 'ai'">
         <div class="text-sm font-medium text-ink-2">{{ t('handleAi') }}</div>
         <div class="text-xs text-muted mt-0.5">{{ t('handleAiDesc') }}</div>
       </button>
@@ -295,7 +362,7 @@ function artLabel(a: any): string {
     </div>
 
     <!-- 通道 1 面板 -->
-    <div v-if="activeCard === 'ai'" class="space-y-3">
+    <div v-if="activeCard === 'ai' && aiModifiableArts.length" class="space-y-3">
       <div>
         <label class="block text-xs text-muted mb-1">{{ t('aiModifyRequest') }}</label>
         <textarea v-model="aiRequest" rows="2" class="w-full glass-input rounded-lg px-3 py-2 text-sm text-ink resize-y" :placeholder="t('aiModifyRequestPlaceholder')"></textarea>
@@ -310,7 +377,30 @@ function artLabel(a: any): string {
           <li v-for="a in impactData.affected || []" :key="a">• {{ a }}</li>
         </ul>
         <p v-if="impactData.retained?.length" class="text-xs text-emerald-400">{{ t('impactRetained') }}: {{ (impactData.retained || []).length }}</p>
-        <p class="text-xs text-accent mt-1">{{ t('continueToApply') }}</p>
+      </div>
+      <!-- AI 修改结果预览 -->
+      <div v-if="aiResult" class="p-3 rounded-lg bg-paper/50 border border-rule/60 space-y-2">
+        <div class="flex items-center justify-between">
+          <p class="text-xs font-medium text-emerald-400">{{ t('aiModifyResult') }}</p>
+          <p v-if="aiResult.diff_summary" class="text-xs text-muted break-all">{{ aiResult.diff_summary }}</p>
+        </div>
+        <div v-if="!aiResult.isImage" class="space-y-2">
+          <div>
+            <label class="block text-xs text-muted mb-1">{{ t('originalContent') }}</label>
+            <pre class="text-xs bg-paper-2 rounded px-2 py-1.5 max-h-32 overflow-auto whitespace-pre-wrap break-all text-ink-2">{{ aiResult.originText }}</pre>
+          </div>
+          <div>
+            <label class="block text-xs text-muted mb-1">{{ t('aiModifyRequest') }}</label>
+            <textarea v-model="aiResult.new_content" rows="5" class="w-full glass-input rounded-lg px-3 py-2 text-xs text-ink resize-y" :placeholder="t('editPlaceholder')"></textarea>
+          </div>
+        </div>
+        <div v-else class="grid grid-cols-2 gap-2">
+          <img :src="aiResult.originUrl" class="rounded-lg border border-rule/60 max-h-40 object-contain w-full" :alt="t('originalContent')" />
+          <img :src="aiResult.new_content" class="rounded-lg border border-emerald-400/40 max-h-40 object-contain w-full" :alt="t('aiModifyResult')" />
+        </div>
+        <button class="w-full text-xs px-4 py-2 bg-accent text-accent-ink rounded-lg transition disabled:opacity-50" :disabled="confirming" @click="applyAiAndContinue">
+          {{ confirming ? t('aiModifyApplying') : t('applyAndContinue') }}
+        </button>
       </div>
     </div>
 

@@ -222,6 +222,15 @@ export function regenCheckpoint(taskId: string, checkpoint: string) {
     method: 'POST',
   }).then((r) => r.json())
 }
+export function aiModify(taskId: string, checkpoint: string, artifactId: string, userRequest: string) {
+  const form = new FormData()
+  form.append('artifact_id', artifactId)
+  form.append('user_request', userRequest)
+  return request(
+    '/api/tasks/' + taskId + '/checkpoints/' + encodeURIComponent(checkpoint) + '/ai-modify',
+    { method: 'POST', body: form },
+  )
+}
 export function uploadArtifact(taskId: string, artifactId: string, file: File) {
   const form = new FormData()
   form.append('file', file)
