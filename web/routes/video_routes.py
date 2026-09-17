@@ -592,14 +592,14 @@ _IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp"}
 
 def _text_diff_summary(old: str, new: str) -> str:
     """轻量文本改动摘要（行级差量 + 字符数变化），不依赖外部 diff 库。"""
-    old_lines = [l for l in old.splitlines() if l.strip()]
-    new_lines = [l for l in new.splitlines() if l.strip()]
+    old_lines = [line for line in old.splitlines() if line.strip()]
+    new_lines = [line for line in new.splitlines() if line.strip()]
     if old_lines == new_lines:
         if old != new:
             return f"内容有变化（字符数 {len(old)} → {len(new)}）"
         return "未检测到内容变化"
-    added = sum(1 for l in new_lines if l not in set(old_lines))
-    removed = sum(1 for l in old_lines if l not in set(new_lines))
+    added = sum(1 for line in new_lines if line not in set(old_lines))
+    removed = sum(1 for line in old_lines if line not in set(new_lines))
     return f"改动摘要：新增 {added} 行，删除 {removed} 行（字符数 {len(old)} → {len(new)}）"
 
 
