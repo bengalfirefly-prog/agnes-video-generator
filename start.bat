@@ -21,16 +21,26 @@ echo ================================================
 echo.
 
 REM ── 环境校验 ────────────────────────────────
+set "PY_CMD=python"
+set "PY_ARGS="
 where python >nul 2>nul
 if errorlevel 1 (
-    call :msg "[X] 未找到 python，请先安装 Python 3.10+：https://www.python.org/downloads/" "[X] python not found. Please install Python 3.10+: https://www.python.org/downloads/"
+    where py >nul 2>nul
+    if not errorlevel 1 (
+        set "PY_CMD=py"
+        set "PY_ARGS=-3"
+    )
+)
+
+if not "%PY_CMD%"=="python" if not "%PY_CMD%"=="py" (
+    call :msg "[X] 未找到 python / py，请先安装 Python 3.10+：https://www.python.org/downloads/" "[X] python / py not found. Please install Python 3.10+: https://www.python.org/downloads/"
     pause
     exit /b 1
 )
 
-python -c "import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)" >nul 2>nul
+%PY_CMD% %PY_ARGS% -c "import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)" >nul 2>nul
 if errorlevel 1 (
-    python --version
+    %PY_CMD% %PY_ARGS% --version
     call :msg "[X] Python 版本过低，需要 3.10+" "[X] Python version too old. Required: 3.10+"
     pause
     exit /b 1
@@ -62,7 +72,7 @@ set "VENV_PIP=%VENV_DIR%\Scripts\pip.exe"
 
 if not exist "%VENV_PYTHON%" (
     call :msg "[1/3] 创建虚拟环境..." "[1/3] Creating virtual environment..."
-    python -m venv "%VENV_DIR%"
+    %PY_CMD% %PY_ARGS% -m venv "%VENV_DIR%"
 )
 
 call :msg "[2/3] 安装依赖..." "[2/3] Installing dependencies..."
@@ -79,8 +89,8 @@ call :msg "   浏览器将自动打开 http://localhost:8765" "   The browser wi
 call :msg "   按 Ctrl+C 停止服务" "   Press Ctrl+C to stop the server"
 echo.
 
-REM 延迟 3 秒后打开浏览器（服务启动中）
-start /b cmd /c "timeout /t 3 /nobreak >nul && start http://localhost:8765"
+REM 等待服务真正就绪后再打开浏览器，避免启动初期出现访问失败
+start "" /b powershell -NoProfile -ExecutionPolicy Bypass -Command "for ($i = 0; $i -lt 120; $i++) { try { $resp = Invoke-WebRequest -Uri 'http://localhost:8765/' -UseBasicParsing -TimeoutSec 2; if ($resp.StatusCode -ge 200 -and $resp.StatusCode -lt 500) { Start-Process 'http://localhost:8765'; break } } catch {} ; Start-Sleep -Milliseconds 500 }"
 
 "%VENV_PYTHON%" server.py
 
